@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="GB2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+	<bean class="com.hundsun.jresplus.beans.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesMode" value="2" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name='properties'>
+			<props>
+				<prop key="validation.message.bean.name"></prop>
+				<prop key="system.dev.mode">false</prop>
+				<prop key="web.vaild">false</prop>
+				<prop key="response.out.charset">UTF-8</prop>
+			</props>
+		</property>
+	</bean>
+	<context:component-scan base-package="com.hundsun.jresplus">
+		<context:include-filter type="annotation"
+			expression="com.hundsun.jresplus.beans.config.BeanOverride" />
+	</context:component-scan>
+	<context:annotation-config />
+	<task:annotation-driven />
+	<bean
+		class="com.hundsun.jresplus.beans.config.OverrideBeanFactoryPostProcessor" />
+	<bean id="objectFactory" class="com.hundsun.jresplus.beans.ObjectFactoryImpl" />
+	<bean id="validator"
+		class="com.hundsun.jresplus.beans.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="objectFactory" ref="objectFactory" />
+		<property name="webVaild" value="${web.vaild}" />
+		<property name="validationMessageBeanName" value="${validation.message.bean.name}" />
+	</bean>
+</beans>

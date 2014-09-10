@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="GB2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<bean
+		class="com.hundsun.jresplus.beans.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesMode" value="2" />
+		<property name='properties'>
+			<props>
+				<prop key="response.out.charset">UTF-8</prop>
+				<prop key="template.resource.loader.path">WEB-INF/views/</prop>
+				<prop key="template.load.charset">UTF-8</prop>
+				<prop key="system.dev.mode">false</prop>
+				<prop key="velocity.velocimacro.library"></prop>
+				<prop key="velocity.user.directive"></prop>
+				<prop key="velocity.eventhandler.invalidreferences.class"></prop>
+				<prop key="velocity.eventhandler.referenceinsertion.class"></prop>
+				<prop key="velocity.eventhandler.nullset.class"></prop>
+				<prop key="toolbox.xml.path">WEB-INF/conf/vm-toolbox.xml</prop>
+				<prop key="web.vaild">false</prop>
+				<prop key="use.default.suffix.pattern">true</prop>
+				<prop key="jres.action.scan"></prop>
+				<prop key="velocity.in.jar.files">*</prop>
+			</props>
+		</property>
+	</bean>
+
+	<context:component-scan base-package="com.hundsun.jresplus,${jres.action.scan}"
+		use-default-filters="false">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Service" />
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Repository" />
+	</context:component-scan>
+
+	<context:annotation-config />
+
+	<bean id="velocityViewCache"
+		class="com.hundsun.jresplus.web.velocity.cache.SimpleHashMapCompactCache" />
+
+	<bean id="velocityConfigurer"
+		class="com.hundsun.jresplus.web.velocity.FixedVelocityConfigurer">
+		<property name="resourceLoaderPath" value="${template.resource.loader.path}" />
+		<property name="velocityProperties">
+			<map>
+				<entry key="resource.loader" value="file,fixedcp" />
+				<entry key="fixedcp.resource.loader.class"
+					value="com.hundsun.jresplus.web.velocity.FixedClasspathResourceLoader" />
+				<entry key="fixedcp.resource.loader.include"
+					value="org/springframework/web/servlet/view/velocity/spring.vm,jresmarco.vm,${velocity.velocimacro.library},${velocity.in.jar.files}" />
+				<entry key="file.resource.loader.cache" value="${negate.system.dev.mode}" />
+				<entry key="file.resource.loader.modificationCheckInterval"
+					value="-1" />
+				<entry key="input.encoding" value="${template.load.charset}" />
+				<entry key="output.encoding" value="${response.out.charset}" />
+				<entry key="direcitive.cache.provider" value-ref="velocityViewCache" />
+				<entry key="direcitive.cache.dev.mode" value="${system.dev.mode}" />
+				<entry key="eventhandler.referenceinsertion.class" value="${velocity.eventhandler.referenceinsertion.class}" />
+				<entry key="velocimacro.library"
+					value="org/springframework/web/servlet/view/velocity/spring.vm,jresmarco.vm,${velocity.velocimacro.library}" />
+				<entry key="userdirective"
+					value="com.hundsun.jresplus.web.velocity.directive.JsCodeDirective,com.hundsun.jresplus.web.cache.PageSnippetCacheDirect,${velocity.user.directive}" />
+				<entry key="eventhandler.invalidreferences.class" value="${velocity.eventhandler.invalidreferences.class}" />
+				<entry key="eventhandler.nullset.class" value="${velocity.eventhandler.nullset.class}" />
+				<entry key="reference.insertion.event.handler.direct.variable.names"
+					value="$!direct-output,$screen_content" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="viewResolver"
+		class="com.hundsun.jresplus.web.velocity.resolver.FixedVelocityLayoutViewResolver">
+		<property name="order" value="10" />
+		<property name="suffix" value=".vm" />
+		<property name="prefix" value="screen/" />
+		<property name="layoutUrl" value="layout/default.vm" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="dateToolAttribute" value="dateTool" />
+		<property name="numberToolAttribute" value="numberTool" />
+		<property name="toolboxConfigLocation" value="${toolbox.xml.path}" />
+		<property name="templateEncoding" value="${template.load.charset}"></property>
+		<property name="devMode" value="${system.dev.mode}"></property>
+		<property name="contentType" value="text/html"></property>
+	</bean>
+
+	<bean id="internalViewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="100" />
+		<property name="prefix" value="/${template.resource.loader.path}screen/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<bean id="defaultHandlerInterceptorAdapter"
+		class="com.hundsun.jresplus.web.adapter.HandlerInterceptorAdapter">
+		<property name="objectFactory" ref="objectFactory" />
+		<property name="mediaTypesHandler" ref="mediaTypesHandler" />
+	</bean>
+
+	<!-- interceptors -->
+	<bean id="brokersInterceptor"
+		class="com.hundsun.jresplus.web.url.URLBrokerLauncherInterceptor"></bean>
+
+	<bean class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+
+	<bean
+		class="com.hundsun.jresplus.web.adapter.ExtendableAnnotationMethodHandlerAdapter">
+		<property name="webVaild" value="${web.vaild}" />
+		<property name="webBindingInitializer" ref="webBindingInitializer" />
+		<property name="mediaTypesHandler" ref="mediaTypesHandler" />
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="com.hundsun.jresplus.web.adapter.StringHttpMessageConverter" >
+						<constructor-arg value="${response.out.charset}"/>
+						<property name="writeAcceptCharset" value="false"/>
+					</bean>
+				<bean
+					class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+					<property name="marshaller">
+						<bean class="org.springframework.oxm.xstream.XStreamMarshaller" />
+					</property>
+					<property name="unmarshaller">
+						<bean class="org.springframework.oxm.xstream.XStreamMarshaller" />
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="objectFactory" ref="objectFactory" />
+	</bean>
+
+	<!-- url mapping -->
+	<bean id="defaultHandlerMapping"
+		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+		<property name="order" value="0" />
+		<property name="interceptors">
+			<list>
+				<ref bean="brokersInterceptor" />
+				<ref bean="defaultHandlerInterceptorAdapter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="order" value="200" />
+		<property name="useDefaultSuffixPattern" value="${use.default.suffix.pattern}" />
+		<property name="interceptors">
+			<list>
+				<ref bean="brokersInterceptor" />
+				<ref bean="defaultHandlerInterceptorAdapter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="lastHandlerMapping"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order" value="999" />
+		<property name="defaultHandler">
+			<bean class="org.springframework.web.servlet.mvc.UrlFilenameViewController"></bean>
+		</property>
+		<property name="interceptors">
+			<list>
+				<ref bean="brokersInterceptor" />
+				<ref bean="defaultHandlerInterceptorAdapter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 文件上传解析 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="${response.out.charset}" />
+	</bean>
+</beans>

@@ -1,0 +1,78 @@
+##2013-7-12 XIE BUG #5306
+#macro(pagelet $paramPageletUrl $paramPagelet )
+		#if($paramPageletUrl)
+			#if($asyncContain)
+				#if($paramPagelet)
+					#if($paramPagelet.id&&$paramPagelet.order)
+						$asyncContain.get($paramPageletUrl,$paramPagelet.order,$paramPagelet.id)
+					#else
+						#if($paramPagelet.id)
+							$asyncContain.get($paramPageletUrl,$paramPagelet.id)
+						#elseif($paramPagelet.order)
+							$asyncContain.get($paramPageletUrl,$paramPagelet.order)
+						#else
+							$asyncContain.get($paramPageletUrl)
+						#end
+					#end
+				#else
+					$asyncContain.get($paramPageletUrl)
+				#end
+    		#else
+    			$contain.get($paramPageletUrl)
+			#end
+		#end
+#end
+#macro(pagelet_end)
+	#if($asyncContain)
+			$asyncContain.export()
+	#else 
+		<script type="text/javascript">
+			if(BigPipe){
+			BigPipe.start();
+			}
+		</script>
+	#end
+#end
+#macro(css $path)
+	#if($asyncContainContext)
+		$asyncContainContext.addCss($path)
+	#else
+		<script type="text/javascript">
+			if(BigPipe){
+			BigPipe.onArrive({"id":new Date().getTime(),"html":"","js":[],"css":["$path"],"jsCode":""});
+			}
+		</script>
+	#end
+#end
+#macro(js $path)
+	#if($asyncContainContext)
+		$asyncContainContext.addJs($path);
+	#else
+		<script type="text/javascript">
+			if(BigPipe){
+			BigPipe.onArrive({"id":new Date().getTime(),"html":"","js":["$path"],"css":[],"jsCode":""});
+			}
+		</script>
+	#end
+#end
+#macro ( direct $direct-output )$!direct-output#end
+#macro ( c $paras )
+	#if($!paras)
+		#set($content = "")
+		#set($key = "")
+		#set($value = "")
+		#foreach($para in $paras)
+			#if($velocityCount == 1)
+				#set($content = $contain.get($!para))
+			#else
+				#if($velocityCount % 2 == 0)
+					#set($key = $para)
+				#else
+					#set($value = $para)
+				#end
+				#set($content = $content.setParameter($key, $value))
+			#end
+		#end
+		$!content
+	#end
+#end

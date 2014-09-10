@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="GB2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<!-- exception resolver -->
+	<bean class="com.hundsun.jresplus.web.servlet.HandlerExceptionResolver" />
+
+	<bean id="ResourceConfigurer"
+		class="com.hundsun.jresplus.beans.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesMode" value="2" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name='properties'>
+			<props>
+				<prop key="response.out.charset">UTF-8</prop>
+				<prop key="session.max.inacterval">-1</prop>
+				<prop key="session.meta.cookie.name">_h_</prop>
+				<prop key="session.meta.cookie.domain"></prop>
+				<prop key="cookies.max.length">4095</prop>
+				<prop key="cookies.max.count">1</prop>
+				<prop key="bigpipe.onoff">true</prop>
+				<prop key="nosession.onoff">true</prop>
+				<prop key="template.load.charset">UTF-8</prop>
+				<prop key="app.server.host"></prop>
+				<prop key="app.server.port">80</prop>
+				<prop key="app.server.protocol">http</prop>
+				<prop key="image.server.host">${app.server.host}</prop>
+				<prop key="image.server.port">${app.server.port}</prop>
+				<prop key="image.server.path"></prop>
+				<prop key="image.server.followContextPath">true</prop>
+				<prop key="image.server.protocol">${app.server.protocol}</prop>
+				<prop key="upload.server.host">${app.server.host}</prop>
+				<prop key="upload.server.port">${app.server.port}</prop>
+				<prop key="upload.server.protocol">${app.server.protocol}</prop>
+				<prop key="upload.server.path"></prop>
+			</props>
+		</property>
+	</bean>
+
+	<context:component-scan base-package="com.hundsun.jresplus">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<context:annotation-config />
+
+	<bean id="mediaTypesHandler" class="com.hundsun.jresplus.web.servlet.MediaTypesHandler">
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+			</map>
+		</property>
+		<property name="defaultContentType" value="text/html" />
+	</bean>
+
+	<bean id="uuidGenerator" class="com.hundsun.jresplus.web.nosession.UUIDPoolGenerator" />
+
+	<!-- URLBrokers -->
+	<bean id="appServerBroker" class="com.hundsun.jresplus.web.url.URLBroker">
+		<property name="name" value="appServer"/>
+		<property name="encoding" value="${response.out.charset}"></property>
+		<property name="config">
+			<bean class="com.hundsun.jresplus.web.url.URLConfig">
+				<property name="host" value="${app.server.host}"></property>
+				<property name="port" value="${app.server.port}"></property>
+				<property name="protocol" value="${app.server.protocol}"></property>
+				<property name="followContextPath" value="true"></property>
+			</bean>
+		</property>
+	</bean>
+	<!-- https的appserver -->
+	<bean id="sslAppServerBroker" class="com.hundsun.jresplus.web.url.URLBroker">
+		<property name="name" value="sslAppServer"/>
+		<property name="encoding" value="${response.out.charset}"></property>
+		<property name="config">
+			<bean class="com.hundsun.jresplus.web.url.URLConfig">
+				<property name="protocol" value="https"></property>
+				<property name="host" value="${app.server.host}"></property>
+				<property name="port" value="${app.server.port}"></property>
+				<property name="followContextPath" value="true"></property>
+			</bean>
+		</property>
+	</bean>
+	<bean id="imageServerBroker" class="com.hundsun.jresplus.web.url.StampURLBroker">
+		<property name="name" value="imageServer"/>
+		<property name="encoding" value="${response.out.charset}"></property>
+		<property name="config">
+			<bean class="com.hundsun.jresplus.web.url.URLConfig">
+				<property name="host" value="${image.server.host}"></property>
+				<property name="port" value="${image.server.port}"></property>
+				<property name="path" value="${image.server.path}" />
+				<property name="protocol" value="${image.server.protocol}"></property>
+				<property name="followContextPath" value="${image.server.followContextPath}"></property>
+			</bean>
+		</property>
+	</bean>
+	<!-- 多主机url 配置 -->
+	<bean id="uploadServerBroker" class="com.hundsun.jresplus.web.url.MultiHostURLBroker">
+		<property name="name" value="uploadServer"/>
+		<property name="encoding" value="${response.out.charset}"></property>
+		<property name="config">
+			<bean class="com.hundsun.jresplus.web.url.MultiHostURLConfig">
+				<property name="hostsValues" value="${upload.server.host}" />
+				<property name="port" value="${upload.server.port}" />
+				<property name="path" value="${upload.server.path}" />
+				<property name="protocol" value="${upload.server.protocol}"></property>
+				<property name="followContextPath" value="false" />
+			</bean>
+		</property>
+	</bean>
+	<bean class="com.hundsun.jresplus.web.url.ServletContextInitHelper"></bean>
+
+	<bean id="encodingFilterBean" class="org.springframework.web.filter.CharacterEncodingFilter">
+		<property name="encoding" value="${response.out.charset}"></property>
+		<property name="forceEncoding" value="false"></property>
+	</bean>
+
+	<bean id="noSessionFilter" class="com.hundsun.jresplus.web.nosession.NoSessionFilter">
+		<property name="objectFactory" ref="objectFactory" />
+		<property name="uuidGenerator" ref="uuidGenerator" />
+		<property name="outCharset" value="${response.out.charset}" />
+		<property name="onoff" value="${nosession.onoff}" />
+		<property name="cookiesManager" ref="cookiesManager" />
+		<property name="encode" ref="cookiesEncode" />
+		<property name="metaCookieName" value="${session.meta.cookie.name}" />
+		<property name="maxInactiveInterval" value="${session.max.inacterval}" />
+		<property name="metaDomain" value="${session.meta.cookie.domain}" />
+	</bean>
+
+	<bean id="containFilter" class="com.hundsun.jresplus.web.contain.ContainFilter">
+		<property name="onOff" value="${bigpipe.onoff}" />
+	</bean>
+
+	<bean id="jresFilter"
+		class="com.hundsun.jresplus.web.servlet.SimpleOncePerRequestFilterChain">
+		<property name="filters">
+			<list>
+				<ref local="encodingFilterBean" />
+				<ref local="noSessionFilter" />
+				<ref local="containFilter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="cookiesManager"
+		class="com.hundsun.jresplus.web.nosession.cookie.CookiesManagerImpl">
+		<property name="maxLength" value="${cookies.max.length}" />
+		<property name="maxCount" value="${cookies.max.count}" />
+	</bean>
+
+	<bean id="cookiesEncode"
+		class="com.hundsun.jresplus.web.nosession.cookie.CookiesEncodeImpl" />
+
+
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+
+	<bean id="webBindingInitializer"
+		class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+		<property name="conversionService" ref="conversionService" />
+		<property name="validator" ref="validator" />
+	</bean>
+</beans>
