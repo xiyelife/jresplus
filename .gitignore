@@ -1,0 +1,5 @@
+*.class
+/classes
+/surefire
+/test-classes
+/maven-archiver
