@@ -12,7 +12,6 @@ jresplus目前包含但不局限与以下模块组件：<br/>
 <li>jresplus-ui</li>
 <li>jresplus-cep</li>
 <li>jresplus-dao</li>
-<li>jresplus-?</li>
 </ul>
 jresplus  模块说明
 ---
