@@ -1,5 +1,5 @@
-*.class
-/classes
-/surefire
-/test-classes
-/maven-archiver
+*/target/surefire
+*/target/test-classes
+*/target/maven-archiver
+*/target/classes/
+
