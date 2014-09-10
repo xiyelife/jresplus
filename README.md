@@ -6,12 +6,14 @@ jresplus是恒生电子研发中心自2013年起发布的一个基于java、spri
 ### jresplus 结构
 jresplus采用maven进行工程管理。<br/>
 jresplus目前包含但不局限与以下模块组件：<br/>
+<ul>
 <li>jresplus-common</li>
 <li>jresplus-mvc</li>
 <li>jresplus-ui</li>
 <li>jresplus-cep</li>
 <li>jresplus-dao</li>
 <li>jresplus-?</li>
+</ul>
 jresplus  模块说明
 ---
 ### jresplus-common
