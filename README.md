@@ -33,3 +33,9 @@ jresplus使用Java的开发技术
 使用到的语言和技术：java,spring,springmvc,velocity,HTML,CSS,Javascript,JQueryapache-common,slf4j,mybatis,Hibernate;<br/>
 开发工具：Eclipse(或IntelliJ IDEA),Maven和Git(或SVN);<br/>
 
+快速开始
+---
+* 访问[wiki](https://github.com/hundsun/jresplus/wiki)了解更多;
+* 下载[jresplus-mvc quick-start project](https://github.com/hundsun/jresplus/tree/master/quick-start/quick_start_mvc.zip)体验jresplus-mvc特性；
+
+
