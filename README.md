@@ -35,7 +35,7 @@ jresplus使用Java的开发技术
 
 参与我们
 ---
-如果你的电脑里还可以放下部短片、或者几首mp3，那么不妨[Fork一下jresplus](https://github.com/hundsun/jresplus/fork)吧，也许它能帮助你换台更好的电脑...
+如果你的电脑里还可以放下一部短片、或者几首mp3，那么不妨[Fork一下jresplus](https://github.com/hundsun/jresplus/fork)吧，也许它能帮助你换台更好的电脑...
 快速开始
 ---
 * 访问[wiki](https://github.com/hundsun/jresplus/wiki)了解更多;
